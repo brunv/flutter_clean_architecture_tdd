@@ -40,32 +40,38 @@ void main() {
       },
     );
 
-    test('should throw a CacheException when there is not a cached value', () {
-      // arrange
-      when(mockSharedPreferences.getString(any)).thenReturn(null);
-      // act
-      // Not calling the method here, just storing it inside a call variable
-      final call = dataSource.getLastNumberTrivia;
-      // assert
-      // Calling the method happens from a higher-order function passed.
-      // This is needed to test if calling a method throws an execption.
-      expect(() => call(), throwsA(isInstanceOf<CacheException>()));
-    });
+    test(
+      'should throw a CacheException when there is not a cached value',
+      () {
+        // arrange
+        when(mockSharedPreferences.getString(any)).thenReturn(null);
+        // act
+        // Not calling the method here, just storing it inside a call variable
+        final call = dataSource.getLastNumberTrivia;
+        // assert
+        // Calling the method happens from a higher-order function passed.
+        // This is needed to test if calling a method throws an execption.
+        expect(() => call(), throwsA(isInstanceOf<CacheException>()));
+      },
+    );
   });
 
   group('cacheNumberTrivia', () {
     final tNumberTriviaModel =
         NumberTriviaModel(text: 'test trivia', number: 1);
 
-    test('should call SharedPreferences to cache the data', () {
-      // act
-      dataSource.cacheNumberTrivia(tNumberTriviaModel);
-      // assert
-      final expectedJsonString = jsonEncode(tNumberTriviaModel.toJson());
-      verify(mockSharedPreferences.setString(
-        'CACHED_NUMBER_TRIVIA',
-        expectedJsonString,
-      ));
-    });
+    test(
+      'should call SharedPreferences to cache the data',
+      () {
+        // act
+        dataSource.cacheNumberTrivia(tNumberTriviaModel);
+        // assert
+        final expectedJsonString = jsonEncode(tNumberTriviaModel.toJson());
+        verify(mockSharedPreferences.setString(
+          CACHED_NUMBER_TRIVIA,
+          expectedJsonString,
+        ));
+      },
+    );
   });
 }
