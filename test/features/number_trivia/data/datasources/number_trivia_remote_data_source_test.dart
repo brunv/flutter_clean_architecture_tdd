@@ -21,6 +21,7 @@ void main() {
   });
 
   void setUpMockHttpClientSucess() {
+    // mockito cannot infer the named parameter, so he havo to use 'anyNamed'
     when(mockHttpClient.get(any, headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(fixture('trivia.json'), 200));
   }
