@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:clean_architecture_tdd/injection_container.dart' as di;
 
-void main() {
+void main() async {
+  // It's our responsibility to invoke the init() method and the best place for
+  // this ​service locator ​initialization is inside the main() function.
+
+  await di.init();
+
+  // It's important to await the Future even though it only contains void. We
+  // definitely don't want the UI to be built up before ​any of the dependencies
+  // had a chance to be registered.​​
+
   runApp(MyApp());
 }
 
@@ -14,7 +24,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );  
+    );
   }
 }
 
