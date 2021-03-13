@@ -1,8 +1,12 @@
+import 'package:clean_architecture_tdd/core/error/failures.dart';
+import 'package:clean_architecture_tdd/core/usecases/usecase.dart';
 import 'package:clean_architecture_tdd/core/util/input_converter.dart';
+import 'package:clean_architecture_tdd/features/number_trivia/domain/entities/number_trivia.dart';
 import 'package:clean_architecture_tdd/features/number_trivia/domain/usecases/get_concrete_number_trivia.dart';
 import 'package:clean_architecture_tdd/features/number_trivia/domain/usecases/get_random_number_trivia.dart';
 import 'package:clean_architecture_tdd/features/number_trivia/presentation/bloc/bloc.dart';
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:meta/meta.dart';
 
 const String SERVER_FAILURE_MESSAGE = 'Server Failure';
@@ -48,8 +52,41 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
         },
         // Although the "success" case doesn't interest us with the current
         // test, we still have to handle it somehow.
-        (integer) => throw UnimplementedError(),
+        (integer) async* {
+          yield Loading();
+          final failureOrTrivia = await getConcreteNumberTrivia(
+            Params(number: integer),
+          );
+          yield* _eitherLoadedOrErrorState(failureOrTrivia);
+        },
       );
+    } else if (event is GetTriviaForRandomNumber) {
+      yield Loading();
+      final failureOrTrivia = await getRandomNumberTrivia(NoParams());
+      yield* _eitherLoadedOrErrorState(failureOrTrivia);
     }
+  }
+}
+
+Stream<NumberTriviaState> _eitherLoadedOrErrorState(
+  Either<Failure, NumberTrivia> either,
+) async* {
+  yield either.fold(
+    (failure) => Error(message: _mapFailureToMessage(failure)),
+    (trivia) => Loaded(trivia: trivia),
+  );
+}
+
+String _mapFailureToMessage(Failure failure) {
+  // Instead of a regular 'if (failure is ServerFailure)...'
+  switch (failure.runtimeType) {
+    case ServerFailure:
+      return SERVER_FAILURE_MESSAGE;
+      break;
+    case CacheFailure:
+      return CACHE_FAILURE_MESSAGE;
+      break;
+    default:
+      return 'Unexpected Error';
   }
 }
