@@ -38,8 +38,8 @@ final sl = GetIt.instance;
 
 // The 'init()' function will be called immediately when the app starts from
 // main.dart. It will be inside that function where all the classes and
-// contracts will be registered and subseqently also injected using the
-// singleton instace of 'GetIt' store inside 'sl'.
+// contracts will be registered and subsequently also injected using the
+// singleton instance of 'GetIt' store inside 'sl'.
 
 Future<void> init() async {
   //* Features - Number Trivia
